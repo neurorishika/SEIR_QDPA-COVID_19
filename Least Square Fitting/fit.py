@@ -46,7 +46,7 @@ def curvefit_model(time,*p):
     RS0 = df.recovered[0]
     D0 = df.dead[0]
     RU0 = r*df.recovered[0]
-    SI0 = 0
+    P0 = 0
     QA0 = 0
     RA0 = 0
     b = p[0]
@@ -93,13 +93,13 @@ def curvefit_model(time,*p):
                                     [       0]])
         return (np.matmul(M,X.reshape(1,-1).T)+C).flatten()
 
-    output = odeint(dX,[N-E0-IS0-QS0-RS0-D0-RU0-SI0-QA0-RA0,E0,IS0,A0,QS0,RS0,D0,RU0,SI0,QA0,RA0],time)
+    output = odeint(dX,[N-E0-IS0-QS0-RS0-D0-RU0-P0-QA0-RA0,E0,IS0,A0,QS0,RS0,D0,RU0,P0,QA0,RA0],time)
     return np.array([output[::10,4]+output[::10,9],output[::10,5],output[::10,6]]).T.flatten()
 
 
 #print("Starting Initial Fit.....",end="")
 try:
-    popt,pcov = curve_fit(curvefit_model,time,df[["active","recovered","dead"]][:-predictionsize].values.flatten(),SI0=guess,method='trf',bounds=param_bounds,sigma=data_weightage)
+    popt,pcov = curve_fit(curvefit_model,time,df[["active","recovered","dead"]][:-predictionsize].values.flatten(),p0=guess,method='trf',bounds=param_bounds,sigma=data_weightage)
 except:
     print("failed")
 #print("Fitted. \nCalculating Goodness of Fit for Uncertainly Analysis.....",end="")
@@ -114,7 +114,7 @@ def model(time,*p,changeATE=None,changeS=None,changeDA=None,lag=None):
     D0 = df.dead[0]
     RU0 = r*df.recovered[0]
     RA0 = 0
-    SI0 = 0
+    P0 = 0
     QA0 = 0
     b = p[0]
     d = p[1]
@@ -124,31 +124,10 @@ def model(time,*p,changeATE=None,changeS=None,changeDA=None,lag=None):
     k = p[6]
 
     def dX(X,t):
-        if (lag is None and t>df.shape[0]) or (lag is not None and t>df.shape[0]+lag):
-            a_t=a_test
-            a = aa
-            s = ss
-            d_a_ = d_a
-            if changeATE is not None:
-                a_t=changeATE/(1-changeATE)
-                s = 0
-                a = aa
-                d_a_ = d_a
-            elif changeS is not None:
-                a_t=a_test
-                s=changeS
-                a = aa
-                d_a_ = d_a
-            elif changeDA is not None:
-                a_t=a_test
-                s= ss
-                a = aa
-                d_a_ = changeDA
-        else:
-            a_t=a_test
-            a = aa
-            s = ss
-            d_a_ = d_a
+        a_t=a_test
+        a = aa
+        s = ss
+        d_a_ = d_a
         M = np.array([[ -a,       0,     0,              0,     0,     0,     0,     0,     s,     0,     0],
                       [  0,-(1+r)*g,     0,              0,     0,     0,     0,     0,     0,     0,     0],
                       [  0,       g,    -d,              0,     0,     0,     0,     0,     0,     0,     0],
@@ -184,7 +163,7 @@ def model(time,*p,changeATE=None,changeS=None,changeDA=None,lag=None):
                                     [       0]])
         return (np.matmul(M,X.reshape(1,-1).T)+C).flatten()
 
-    return odeint(dX,[N-E0-IS0-QS0-RS0-D0-RU0-SI0-QA0-RA0,E0,IS0,A0,QS0,RS0,D0,RU0,SI0,QA0,RA0],time)
+    return odeint(dX,[N-E0-IS0-QS0-RS0-D0-RU0-P0-QA0-RA0,E0,IS0,A0,QS0,RS0,D0,RU0,P0,QA0,RA0],time)
 
 n = (df.shape[0]-predictionsize)*3                      # Number of Data Points
 p = len(popt)                          # Number of Parameters
@@ -234,7 +213,7 @@ fit_fail=0
 for i in range(n_bootstrap):
     resample = np.random.poisson(Po_mean)
     try:
-        popt_b,pcov_b = curve_fit(curvefit_model,time,resample.flatten(),SI0=guess,method='trf',bounds=param_bounds,sigma=data_weightage)
+        popt_b,pcov_b = curve_fit(curvefit_model,time,resample.flatten(),P0=guess,method='trf',bounds=param_bounds,sigma=data_weightage)
         popts.append(popt_b)
         np.save(countryname+folder+"bootstrap/optimal_prediction_{}.npy".format(i),model(np.arange(0,df.shape[0],0.1)+365,*popt)[::10,:])
     except:
