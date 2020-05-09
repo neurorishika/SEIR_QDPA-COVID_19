@@ -37,3 +37,15 @@ output<-bsmedian(x = fitvalues,B=10000)
 mean(output)
 quantile(output,.025)
 quantile(output,.975)
+
+bsiqr <- function(x,B){
+  bstrap <- c()
+  for (i in 1:B){
+    bstrap <- c(bstrap,IQR(sample(x,length(x),replace=T)))
+  }
+  return(bstrap)
+}
+output<-bsiqr(x = fitvalues,B=10000)
+mean(output)
+quantile(output,.025)
+quantile(output,.975)
