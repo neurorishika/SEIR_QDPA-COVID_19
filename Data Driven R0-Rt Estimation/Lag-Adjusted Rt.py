@@ -34,7 +34,7 @@ rt = []
 for n in range(1000):
     print("Iteration: ",n+1,end='\r')
     dataset = np.copy(real_data)
-    G = gamma(3.2683698+0.6162469*np.random.normal(),0.6110944+0.1958257*np.random.normal())
+    G = gamma(3.325+0.616*np.random.normal(),0.979+0.195*np.random.normal())
     for i in range(len(dataset)):
         send_back = np.clip(np.round(G.rvs(dataset[i])),0,10)
         send_back = send_back[i-send_back>=0]
