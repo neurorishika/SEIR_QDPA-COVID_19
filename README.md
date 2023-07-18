@@ -1,4 +1,4 @@
-# SEIR-QDPA - An epidemiological model to study COVID_19
+# SEIR-QDPA - An epidemiological model to study SARS-CoV-2 (COVID-19)
 Code and Data for Gupta and Mohanta, et. al. (2020)
 
 **Paper:** [Transmission dynamics of the COVID-19 epidemic in India and modeling optimal lockdown exit strategies](https://www.sciencedirect.com/science/article/pii/S1201971220325224)
